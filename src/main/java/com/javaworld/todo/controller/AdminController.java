@@ -21,10 +21,16 @@ import com.javaworld.todo.dto.UserDTO;
 import com.javaworld.todo.service.impl.AuthServiceImpl;
 import com.javaworld.todo.service.impl.UserServiceImpl;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/admin")
+@Tag(name = "Admin API", description = "APIs for admin operations")
 public class AdminController {
 
 	@Autowired
@@ -33,7 +39,13 @@ public class AdminController {
 	@Autowired
     UserServiceImpl userServiceImpl;
 	
-
+	@Operation(summary = "Register a new admin user",
+            responses = {
+                @ApiResponse(responseCode = "201", description = "Admin user created successfully",
+                    content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ResponsePayload.class))),
+                @ApiResponse(responseCode = "400", description = "Invalid request")
+            })
 	@PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterDTO signUpRequest) {
 		
@@ -49,7 +61,13 @@ public class AdminController {
     	);
 	}
 	
-
+	 @Operation(summary = "Get all users",
+             responses = {
+                 @ApiResponse(responseCode = "200", description = "List of users",
+                     content = @Content(mediaType = "application/json",
+                     schema = @Schema(implementation = ResponsePayload.class))),
+                 @ApiResponse(responseCode = "404", description = "No users found")
+             })
     @GetMapping("/getusers")
     public ResponseEntity<ResponsePayload<?>> getAllUsers() {
     	
@@ -66,6 +84,11 @@ public class AdminController {
       
     }
 
+	 @Operation(summary = "Update user role",
+             responses = {
+                 @ApiResponse(responseCode = "200", description = "User role updated successfully"),
+                 @ApiResponse(responseCode = "404", description = "User not found")
+             })	 
     @PutMapping("/update-role")
     public ResponseEntity<?> updateUserRole(@RequestParam Long userId, 
                                                  @RequestParam String roleName) {
@@ -82,6 +105,13 @@ public class AdminController {
 
     }
 
+	 @Operation(summary = "Get a user by ID",
+             responses = {
+                 @ApiResponse(responseCode = "200", description = "User details",
+                     content = @Content(mediaType = "application/json",
+                     schema = @Schema(implementation = ResponsePayload.class))),
+                 @ApiResponse(responseCode = "404", description = "User not found")
+             })
     @GetMapping("/user/{id}")
     public ResponseEntity<?> getUser(@PathVariable Long id) {
     	UserDTO user=userServiceImpl.getUserById(id);
